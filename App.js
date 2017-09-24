@@ -35,7 +35,17 @@ import {
     MediaStates
 } from 'react-native-audio-toolkit';
 import importSyles from './styles'
-import renderSubs from './routs/renderSubs'
+import renderSubs from './src/renderSubs'
+import {
+  renderDownloads,
+  getHeightOfPSV,
+  getReadableTime,
+  between
+} from './src/functions'
+import {
+  appId,
+  callback
+} from './keys'
 
 let {height, width} = Dimensions.get('window');
 const styles = importSyles(width, height)
@@ -253,41 +263,6 @@ export default class podcast extends React.Component {
     });
   }
 
-  getEppisodeName(title) {
-    if (isNaN(parseInt(title))) {
-      if (title.split(' ').length > 2) {
-        for (var i = 0; i < 3; i++) {
-          if (!isNaN(parseInt(title.split(' ')[i]))) {
-            return parseInt(title.split(' ')[i]);
-          }else if(title.split(' ')[i].includes('#')){
-            console.log(title.split(' ')[i].split('#'));
-            for (var x = 0; x < title.split(' ')[i].split('#').length; x++) {
-              if (!isNaN(parseInt(title.split(' ')[i].split('#')[x]))) {
-                return parseInt(title.split(' ')[i].split('#')[x]);
-              }
-            }
-          }
-        }
-      }else{
-        for (var i = 0; i < title.split(' ').length; i++) {
-          if (!isNaN(parseInt(title.split(' ')[i]))) {
-            return parseInt(title.split(' ')[i]);
-          }else if(title.split(' ')[i].includes('#')){
-            console.log(title.split(' ')[i].split('#'));
-            for (var x = 0; x < title.split(' ')[i].split('#').length; x++) {
-              if (!isNaN(parseInt(title.split(' ')[i].split('#')[x]))) {
-                return parseInt(title.split(' ')[i].split('#')[x]);
-              }
-            }
-          }
-        }
-      }
-      return title.split(' ')[0].split('')[0]
-    }else{
-      return parseInt(title)
-    }
-  }
-
   componentWillUpdate(){
     if (casting && casting.isPrepared){
       //alert('isplaying4real')
@@ -303,75 +278,12 @@ export default class podcast extends React.Component {
     }
   }
 
-  between(n) {
-    var a = n-10;
-    var b = n+10;
-    return (n - a) * (n - b) <= 0
-  }
-
-  getReadableTime(m){
-    console.log('s: ', Math.round((m/1000)%60));
-    console.log('m: ', Math.round((m/(1000*60))%60));
-    console.log('h: ', Math.round((m/(1000*60*60))%24));
-    if (m > 0) {
-      return {
-        seconds:(m/1000)%60,
-        minutes:(m/(1000*60))%60,
-        hours:(m/(1000*60*60))%24,
-      };
-    }else{
-      return {
-        seconds:0,
-        minutes:0,
-        hours:0,
-      };
-    }
-  }
-
-  getHeightOfPSV(){
-    if (casting) {
-      return height-95;
-    }
-    return height - 20;
-  }
-
-  renderDownloads() {
-    var output = [];
-    var show = this.state.downloadedShows;
-
-
-    if (show) {
-      show.forEach((data, i) => {
-        if (data.enclosures) {
-          output.push(
-            data
-          )
-        }
-      })
-
-      return output;
-    }
-  }
-
   _onChecked(event){
     this.setState({checked: event});
   }
 
   renderEpisode(show){
     var output = [];
-    var show = this.state.show;
-    // console.log('log for inclueds ', this.state.downloadedShows);
-    //
-    // if (!this.state.downloadedShows) {
-    //   AsyncStorage.getItem('Offline', (err, result) => {
-    //     console.log('result ', result);
-    //     if (!result) {
-    //       this.setState({downloadedShows: []})
-    //     }else{
-    //       this.setState({downloadedShows: JSON.parse(result)})
-    //     }
-    //   })
-    // }
 
     if (show) {
       show.items.forEach((data, i) => {
@@ -487,7 +399,7 @@ export default class podcast extends React.Component {
 
   render() {
     var downloads = [];
-    var toMap = this.renderDownloads();
+    var toMap = renderDownloads(this.state.downloadedShows);
     console.log('tomap ', toMap);
 
     if (Array.isArray(toMap)) {
@@ -532,7 +444,6 @@ export default class podcast extends React.Component {
                   casting.play()
                   .on('ended', () => {
                     // Enable button again after playback finishes
-      //                    this.setState({disabled: false});
                   });
                 }
 
@@ -608,7 +519,7 @@ export default class podcast extends React.Component {
         <View>
         <PagedScrollView
           keyboardShouldPersistTaps={true}
-          style={{height: this.getHeightOfPSV(), backgroundColor: '#F5FCFF',}}
+          style={{height: getHeightOfPSV(casting, height), backgroundColor: '#F5FCFF',}}
           ref={(pages) => { this.PagedScrollView = pages }}
           onInitialization={() => {
             //this.PagedScrollView.scrollToPage(width, 0, false)
@@ -696,8 +607,8 @@ export default class podcast extends React.Component {
             <FlatLogoutButton
                 onPress={() => {
                   google({
-                    appId: '893909331909-5tvkbj2gqsvi2gfvpg3rekdm1al68kfg.apps.googleusercontent.com',
-                    callback: 'com.googleusercontent.apps.893909331909-5tvkbj2gqsvi2gfvpg3rekdm1al68kfg:/oauth2redirect',
+                    appId: appId,
+                    callback: callback,
                   }).then((info) => {
                     info.user.subscriptions = [];
                     console.log('google u: ', info.user);
@@ -727,7 +638,7 @@ export default class podcast extends React.Component {
                 flexDirection: 'row',
                 flexWrap: 'wrap'
               }}>
-                {this.renderEpisode()}
+                {this.renderEpisode(this.state.show)}
               </View>
             </ScrollView>
           </View>
@@ -784,14 +695,14 @@ export default class podcast extends React.Component {
                   }}
                 />
                 <Text style={{textAlign: 'left'}}>
-                  {Math.round(this.getReadableTime(casting.currentTime).hours)}
-                : {Math.round(this.getReadableTime(casting.currentTime).minutes)}
-                : {Math.round(this.getReadableTime(casting.currentTime).seconds)}
+                  {Math.round(getReadableTime(casting.currentTime).hours)}
+                : {Math.round(getReadableTime(casting.currentTime).minutes)}
+                : {Math.round(getReadableTime(casting.currentTime).seconds)}
                 </Text>
                 <Text style={{textAlign: 'right', flex:1,}}>
-                  {Math.round(this.getReadableTime(casting.duration).hours)}
-                : {Math.round(this.getReadableTime(casting.duration).minutes)}
-                : {Math.round(this.getReadableTime(casting.duration).seconds)}
+                  {Math.round(getReadableTime(casting.duration).hours)}
+                : {Math.round(getReadableTime(casting.duration).minutes)}
+                : {Math.round(getReadableTime(casting.duration).seconds)}
                 </Text>
               </View>
             </View>
@@ -806,8 +717,8 @@ export default class podcast extends React.Component {
             onPress={() => {
               console.log('starting login');
               google({
-                appId: '****',
-                callback: '****',
+                appId: appId,
+                callback: callback,
               }).then((info) => {
                 info.user.subscriptions = [];
                 console.log('google u: ', info.user);
