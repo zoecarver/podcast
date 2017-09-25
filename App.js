@@ -885,3 +885,4 @@ export default class podcast extends React.Component {
 //TODO: move all inline styles to ./styles/*.js
 //TODO: condisionally remove the "episodes" page
 //TODO: move all functions and block elements into there own scripts in ./src/*.js
+//TODO: fix notifications
