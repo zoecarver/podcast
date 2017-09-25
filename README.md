@@ -41,6 +41,7 @@ Mainly for security reason the server code is not open source. If you need the s
 I will add this part soon.
 
 ### Project Structure
+I will add this part soon.
 
 ## Screenshots
 ![android_screen_req](https://github.com/pudility/podcast/blob/master/screenshots/giphy.gif)
