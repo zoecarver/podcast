@@ -43,3 +43,4 @@ I will add this part soon.
 ### Project Structure
 
 ## Screenshots
+![android_screen_req](https://github.com/pudility/podcast/blob/master/screenshots/giphy.gif)
