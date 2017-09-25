@@ -29,7 +29,7 @@ react-native run-android
 ```
 
 ## TODO
-You will see that there are **lots** of things to do. `App.js` contains comments with `//TODO: <tast>`. We really appreciate any help you can give us!
+You will see that there are **lots** of things to do. `App.js` contains comments with `//TODO: <task>`. We really appreciate any help you can give us!
 
 ## Contributing
 Currently there are no contributing guidelines.
@@ -40,7 +40,7 @@ Mainly for security reason the server code is not open source. If you need the s
 ### Server Endpoints
 I will add this part soon.
 
-### Project Structure
+## Project Structure
 I will add this part soon.
 
 ## Screenshots
