@@ -38,7 +38,16 @@ Currently there are no contributing guidelines.
 Mainly for security reason the server code is not open source. If you need the server to do something that it is not currently doing, please submit an issue and I will try to add it ASAP.
 
 ### Server Endpoints
-I will add this part soon.
+Given the fact that you cannot see the server code, here are the various endpoints that can be used:
+
+| Endpoint               | Description                              | Body                                     |
+| ---------------------- | ---------------------------------------- | ---------------------------------------- |
+| `/load`                | Loads the subscriptions of a particular user | `user`: `JSON String` (The full user object stringified) |
+| `/subscribe`           | Subscribes user to particular podcast    | - `id`: `String` (the id of the user `user.id`) <br> - `podId`:`String` (the id of a podcast `collectionId`) |
+| `/unsubscribe`         | Unsubscribes user to particular podcast  | - `id`: `String` (the id of the user `user.id`) <br> - `podId`:`String` (the id of a podcast `collectionId`) |
+| `/search/:search_term` | Searches for a podcast                   | None                                     |
+
+
 
 ## Project Structure
 I will add this part soon.
